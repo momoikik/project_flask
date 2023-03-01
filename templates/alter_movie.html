@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Alter movie</title>
+</head>
+    <link rel="stylesheet" href="/static/style.css">
+
+<body>
+<div>
+<a href="/"> <img src="../static/home_page.jpg" width="50" height="50"> </a>
+    </div>
+<form method="post" enctype="multipart/form-data">
+      <dl>
+        <labe>Poster update</labe>
+        <p>
+          <input type="file" name="filename">
+        </p>
+      </dl>
+        <label>Movie title</label></br>
+        <input type="text" name="movie_title"></br>
+        <label>Description</label></br>
+        <textarea type="text" name="description"></textarea></br>
+        <label>Director</label></br>
+        <input type="text" name="director" ></br>
+        <label>Release year</label>
+        <input type="number" name="release_year"></br>
+        <label>Actors</label></br>
+        <input type="text" name="actors"></br>
+        <button type="submit">Update</button></br>
+    </form>
+</body>
+</html>

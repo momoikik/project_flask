@@ -1,0 +1,38 @@
+
+body{
+    background-color: #9fbfdf;
+    align-content:center;
+    color:black;
+
+}
+p{
+    color:white;
+    font-family: fantasy;
+
+}
+input{
+    font-family: fantasy;
+
+}
+
+.image {
+
+    width: 300px;
+    margin-right: auto;
+    margin-left: auto;
+    display: block;
+    border-radius: 5%;
+
+}
+
+li {
+font-size: 1.2rem;
+padding-block-end: 1rem;
+
+}
+
+.divider {
+ border-style: inset;
+ border-bottom: 0.1px;
+ width: 10%;
+}

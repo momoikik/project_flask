@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My movie</title>
+</head>
+    <link rel="stylesheet" href="/static/style.css">
+<body>
+
+<a href="/"> <img src="../static/home_page.jpg" width="50" height="50"> </a>
+<h1>{{movie_specific.movie_title}}</h1>
+<img class="image" width="350" height="300"  src="{{ url_for('display_image', filename=movie_specific.filename)}}">
+
+<ul style="list-style-type:none;">
+
+
+  <li>Description:</li>
+      <li>{{movie_specific.description}}</li>
+  <li>Director:</li>
+      <li>{{movie_specific.director}}</li>
+  <li>Year:</li>
+     <li> {{movie_specific.release_year}}</li>
+    <li>Actors:</li>
+        <li>{{movie_specific.actors}}</li>
+</ul>
+<ul>
+<form method="post" action="/add_review" >
+    <label>Name :</label></br>
+    <input type="text" name="name" required></br>
+    <label>Review :</label></br>
+    <textarea type="text" name="review_text"></textarea></br>
+    <label>rating :</label></br>
+    <input min="1" max="10" type="number" name="rating" ></textarea> </br>
+
+
+    <input type="hidden" name="movie_id" value="{{movie_specific.id}}">
+    <button type="submit">ADD</button>
+</form>
+</ul>
+
+<ul>
+    {%for review in reviews_specific %}
+<div style="background-color: #ecf2f9 ; margin: 10px 10px " class="movie_review">
+    <div class="movie_review_name"> {{review.name}} </div>
+
+       <div class="movie_review_text">{{review.review_text}}</div>
+
+        <div class="movie_review_rating">{{review.rating}}</div>
+
+</div>
+</ul>
+    {%endfor%}
+    </div>
+
+<a href="/delete/{{movie_specific.id}}"> <img src="../static/delete.webp" width="120" height="100"></a>
+<a href="/alter_movie/{{movie_specific.id}}"> <img src="../static/alter_new.jpg" width="120" height="100"></a>
+
+
+</body>
+</html>
