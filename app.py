@@ -3,10 +3,14 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 import os
 import random,string
+import re
+
 def randomword(length):
     letters=string.ascii_letters
     return ''.join(random.choice(letters)for i in range(length))
+
 app = Flask(__name__)
+app.secret_key = 'secret_key'
 app.debug = True
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///movies.db'
 app.config['UPLOAD_FOLDER'] = 'static/uploads/'
@@ -44,16 +48,55 @@ class Reviews(db.Model):
     def __repr__(self):
         return f"Name: {self.name}, Content: {self.review_text}"
 
+class Password(db.Model):
+    id=db.Column(db.Integer, primary_key=True)
+    password=db.Column(db.String, unique=False, nullable=False)
+    Email=db.Column(db.String(50), unique=True, nullable=False)
+    Name=db.Column(db.String(20), unique=False, nullable=False)
+    phone_number=db.Column(db.String, unique=False, nullable=False)
+    def __repr__(self):
+        return f"password: {self.name}, Content: {self.Email}"
 
 migrate = Migrate(app, db)
 
 
 @app.route("/")
+def Log_in():
+    return render_template("Log_in.html")
+
+@app.route("/Log_in", methods=["POST"])
+def Login():
+    if request.method == "POST":
+        Email = request.form.get("Email")
+        password=request.form.get("password")
+
+        if Email == "Admin@gmail.com" and password=="Admin":
+            return redirect("/Home_page_Admin")
+        if not re.match(r"[^@]+@[^@]+\.[^@]+", Email):
+            return render_template("Log_in.html", IncorrectEmailFormat=True)
+
+        lst = Password.query.filter(Password.Email == Email,Password.password==password)
+        if len(lst.all()) == 0 :
+            return render_template("Log_in.html", email_not_found=True)
+
+        return redirect("/Home_page")
+
+    return render_template("Log_in.html")
+
+
+@app.route("/Home_page")
 def home():
     movies_data = Movies.query.all()
-    return render_template("index.html", movies_data=movies_data)
+    return render_template("index.html", movies_data=movies_data, IsCurrentUserAdmin=False)
 
+@app.route("/Home_page_Admin")
+def home2():
+    movies_data = Movies.query.all()
+    return render_template("index.html", movies_data=movies_data, IsCurrentUserAdmin=True)
 
+@app.route("/Sign_in")
+def Sign_in():
+    return render_template("Sign_in.html", email_found=False)
 @app.route("/add_data")
 def add_data():
     return render_template("add_profile.html")
@@ -78,21 +121,29 @@ def movie_management():
                            release_year=release_year, filename=file_name, actors=actors)
         db.session.add(movie_row)
         db.session.commit()
-        return redirect("/")
+        return redirect("/Home_page_Admin")
 
 
 @app.route("/display/<filename>")
 def display_image(filename):
     return redirect(url_for('static', filename='uploads/' + filename))
 
-
 @app.route('/movie_info/<movie_id>')
 def movie_info(movie_id):
     movie_specific = Movies.query.get(movie_id)
     reviews_specific = Reviews.query.filter(Reviews.movie_id == movie_id)
-    return render_template("movie_info.html", movie_specific=movie_specific, reviews_specific=reviews_specific)
-
-
+    return render_template("movie_info.html", movie_specific=movie_specific, reviews_specific=reviews_specific, IsCurrentUserAdmin=False)
+@app.route('/movie_info_admin/<movie_id>')
+def movie_info_admin(movie_id):
+    movie_specific = Movies.query.get(movie_id)
+    reviews_specific = Reviews.query.filter(Reviews.movie_id == movie_id)
+    return render_template("movie_info.html", movie_specific=movie_specific, reviews_specific=reviews_specific, IsCurrentUserAdmin=True)
+@app.route('/remove_review/<movie_id>/<review_id>')
+def remove_review(movie_id, review_id):
+    review = Reviews.query.get(review_id)
+    db.session.delete(review)
+    db.session.commit()
+    return redirect(f"/movie_info/{movie_id}")
 @app.route("/add_review", methods=["POST"])
 def review_management():
     if request.method == "POST":
@@ -106,6 +157,25 @@ def review_management():
         db.session.commit()
         return redirect("/movie_info/" + movie_id)
 
+@app.route("/Sign_in", methods=["POST"])
+def Sign():
+    if request.method == "POST":
+        Name = request.form.get("Name")
+        phone_number= request.form.get("phone_number")
+        Email = request.form.get("Email")
+        password=request.form.get("password")
+
+        if not re.match(r"[^@]+@[^@]+\.[^@]+", Email):
+            return render_template("Sign_in.html", IncorrectEmailFormat=True)
+
+        lst = Password.query.filter(Password.Email == Email)
+        if len(lst.all()) > 0:
+            return render_template("Sign_in.html", email_found=True)
+
+        Add_user = Password (password=password,Email=Email,Name=Name, phone_number=phone_number)
+        db.session.add(Add_user)
+        db.session.commit()
+        return redirect("/")
 
 @app.route("/delete/<int:id>")
 def erase(id):
@@ -117,7 +187,7 @@ def erase(id):
     for review in reviews_specific:
         db.session.delete(review)
     db.session.commit()
-    return redirect("/")
+    return redirect("/Home_page_Admin")
 
 
 @app.route("/alter_movie/<int:id>", methods=["POST", "GET"])
@@ -147,7 +217,7 @@ def alter_movie(id):
             data.filename = file_name
 
         db.session.commit()
-        return redirect(url_for('movie_info', movie_id=id))
+        return redirect(url_for('movie_info_admin', movie_id=id))
     else:
         return render_template("alter_movie.html")
 
@@ -162,6 +232,8 @@ def search():
 
         return render_template('index.html', movies_data=movies_data, pageTitle='Movies', legend="Search Results")
     else:
-        return redirect("/")
+        return redirect("/Home_page")
+
+
 if __name__ == "__main__":
     app.run()

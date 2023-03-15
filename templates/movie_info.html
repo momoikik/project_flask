@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="/static/style.css">
 <body>
 
-<a href="/"> <img src="../static/home_page.jpg" width="50" height="50"> </a>
+<a href="/Home_page"> <img src="../static/home_page.jpg" width="50" height="50"> </a>
 <h1>{{movie_specific.movie_title}}</h1>
 <img class="image" width="350" height="300"  src="{{ url_for('display_image', filename=movie_specific.filename)}}">
 
@@ -40,20 +40,29 @@
 
 <ul>
     {%for review in reviews_specific %}
-<div style="background-color: #ecf2f9 ; margin: 10px 10px " class="movie_review">
+<div style="background-color: #ecf2f9 ; margin: 10px 10px " class="movie_review" data-test-id={{review.id}}>
     <div class="movie_review_name"> {{review.name}} </div>
 
        <div class="movie_review_text">{{review.review_text}}</div>
 
         <div class="movie_review_rating">{{review.rating}}</div>
 
+        <div class="movie_review_name"> <a href="/remove_review/{{movie_specific.id}}/{{review.id}}"> Remove </a> </div>
+
 </div>
 </ul>
     {%endfor%}
-    </div>
+ </div>
 
-<a href="/delete/{{movie_specific.id}}"> <img src="../static/delete.webp" width="120" height="100"></a>
+
+    {%if IsCurrentUserAdmin %}
+<div id="admin_controls">
+        <a href="/delete/{{movie_specific.id}}"> <img src="../static/delete.webp" width="120" height="100"></a>
+
 <a href="/alter_movie/{{movie_specific.id}}"> <img src="../static/alter_new.jpg" width="120" height="100"></a>
+</div>
+    {%endif%}
+
 
 
 </body>

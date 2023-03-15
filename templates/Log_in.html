@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Log in</title>
+</head>
+<body>
+ <p style="display: flex;align-items: center;flex-direction:column;margin-block-start: 4rem;margin-block-end: 2rem">
+ <center>
+ <form action="/Log_in" method="post" enctype="multipart/form-data">
+          <label>Email :</label></br>
+    <input type="text" name="Email" required></br>
+    <label>Password :</label></br>
+    <input  type="password" name="password" required></br>
+     <button type="submit">Log-In</button></br>
+     </form>
+
+     Don't have an account ? <a href="/Sign_in"> Register here </a>
+
+    {% if email_not_found %}
+        <h2 style="color:red">Incorrect Email or password !</h2>
+     {% endif %}
+
+ {% if IncorrectEmailFormat %}
+        <h2 style="color:red">Incorrect Email Format !</h2>
+     {% endif %}
+ </center>
+</p>
+</body>
+</html>

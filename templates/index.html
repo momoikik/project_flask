@@ -7,8 +7,9 @@
 </head>
 <body align="center">
     <div style="display:flex;align-items:flex-start;">
-        <a href="/"> <img src="../static/home_page.jpg" width="50" height="50"> </a>
+        {% if IsCurrentUserAdmin %}
         <a href="/add_data"> <img src="../static/add_New.png" width="60" height="50"></a>
+        {% endif %}
     </div>
         <a style="display: flex;align-items: center;flex-direction:column;margin-block-start: 4rem;margin-block-end: 2rem">
         <form method="post" action="{{url_for('search')}}" style="display: flex;">
@@ -17,7 +18,13 @@
         </form></a>
 
     {% for movie in movies_data%}
-    <a href="{{url_for('movie_info', movie_id=movie.id)}}"> <img  width="350" height="300" style="border-radius: 5%; text-align: center;margin: 10px 10px 10px 10px" src="{{ url_for('display_image', filename=movie.filename)}}"></a>
+        {% if IsCurrentUserAdmin %}
+            <a href="{{url_for('movie_info_admin', movie_id=movie.id)}}"> <img  width="350" height="300" style="border-radius: 5%; text-align: center;margin: 10px 10px 10px 10px" src="{{ url_for('display_image', filename=movie.filename)}}"></a>
+        {%endif%}
+
+        {% if not(IsCurrentUserAdmin) %}
+            <a href="{{url_for('movie_info', movie_id=movie.id)}}"> <img  width="350" height="300" style="border-radius: 5%; text-align: center;margin: 10px 10px 10px 10px" src="{{ url_for('display_image', filename=movie.filename)}}"></a>
+        {%endif%}
     
     {%endfor%}
 </body>
